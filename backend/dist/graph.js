@@ -138,7 +138,7 @@ class Graph {
         const m = matrix.length;
         const n = matrix[0].length;
         const start = [m - 1, n - 1];
-        const end = [m - 1, 0];
+        const end = [0, n - 1];
         const visited = Array.from({ length: m }, () => Array(n).fill(false));
         const directions = [
             [0, 1],
@@ -167,7 +167,7 @@ class Graph {
                 if (isValid(nx, ny) && !visited[nx][ny]) {
                     visited[nx][ny] = true;
                     currentPath.push([nx, ny]);
-                    const key = `${nx},${ny}`;
+                    const key = [nx, ny];
                     if (nodesToCover.some((node) => node[0] === nx && node[1] === ny)) {
                         backtrack(nx, ny, new Set(covered).add(key), pathLen + 1, currentPath);
                     }
@@ -266,6 +266,19 @@ function main() {
             console.log(board[i][j].print());
         }
     }
+    const matrix = Array(4)
+        .fill(null)
+        .map(() => Array(4).fill(0)); // Properly initialize the matrix
+    const nodesToCover = [
+        [0, 0],
+        [3, 0],
+        [0, 1],
+        [0, 2],
+        [2, 1],
+    ];
+    const [distance, path] = graph.shortestPath(matrix, nodesToCover);
+    console.log("Distance", distance);
+    console.log("Path", path);
     // console.log("Result: ", result);
     // console.log(edges.length);
     // for (const edge of edges) {
