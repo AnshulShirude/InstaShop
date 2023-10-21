@@ -97,6 +97,11 @@ class Graph {
     }
   }
 
+  // adds an item on our Map to represent a Node
+  createTransalation(aisleName: string, node: Node) {
+    this.itemTranslation.set(aisleName, node);
+  }
+
   createAisles(upperLeft: Node, lowerRight: Node) {
     let leftX = upperLeft.x;
     let rightX = lowerRight.x;
@@ -204,48 +209,52 @@ class Graph {
     const isValid = (x: number, y: number) =>
       0 <= x && x < m && 0 <= y && y < n;
 
-      const backtrack = (
-        x: number,
-        y: number,
-        covered: Set<[number, number]>,
-        pathLen: number,
-        currentPath: number[][]
-      ) => {
+    const backtrack = (
+      x: number,
+      y: number,
+      covered: Set<[number, number]>,
+      pathLen: number,
+      currentPath: number[][]
+    ) => {
+      if (
+        x === end[0] &&
+        y === end[1] &&
+        covered.size === nodesToCover.length
+      ) {
+        if (pathLen < bestPathLen) {
+          bestPathLen = pathLen;
+          bestPathNodes = [...currentPath];
+        }
+        return;
+      }
+      if (pathLen >= bestPathLen) return;
+      for (const [dx, dy] of directions) {
+        const nx = x + dx;
+        const ny = y + dy;
         if (
-          x === end[0] &&
-          y === end[1] &&
-          covered.size === nodesToCover.length
+          isValid(nx, ny) &&
+          !visited[nx][ny] &&
+          !this.board[nx][ny].withinBorder
         ) {
-          if (pathLen < bestPathLen) {
-            bestPathLen = pathLen;
-            bestPathNodes = [...currentPath];
+          visited[nx][ny] = true;
+          currentPath.push([nx, ny]);
+          const key: [number, number] = [nx, ny];
+          if (nodesToCover.some((node) => node[0] === nx && node[1] === ny)) {
+            backtrack(
+              nx,
+              ny,
+              new Set(covered).add(key),
+              pathLen + 1,
+              currentPath
+            );
+          } else {
+            backtrack(nx, ny, covered, pathLen + 1, currentPath);
           }
-          return;
+          currentPath.pop();
+          visited[nx][ny] = false;
         }
-        if (pathLen >= bestPathLen) return;
-        for (const [dx, dy] of directions) {
-          const nx = x + dx;
-          const ny = y + dy;
-          if (isValid(nx, ny) && !visited[nx][ny] && !this.board[nx][ny].withinBorder) {
-            visited[nx][ny] = true;
-            currentPath.push([nx, ny]);
-            const key: [number, number] = [nx, ny];
-            if (nodesToCover.some((node) => node[0] === nx && node[1] === ny)) {
-              backtrack(
-                nx,
-                ny,
-                new Set(covered).add(key),
-                pathLen + 1,
-                currentPath
-              );
-            } else {
-              backtrack(nx, ny, covered, pathLen + 1, currentPath);
-            }
-            currentPath.pop();
-            visited[nx][ny] = false;
-          }
-        }
-      };
+      }
+    };
 
     visited[start[0]][start[1]] = true;
     backtrack(start[0], start[1], new Set(), 0, [start]);
