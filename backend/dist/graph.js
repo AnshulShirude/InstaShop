@@ -164,7 +164,7 @@ class Graph {
             for (const [dx, dy] of directions) {
                 const nx = x + dx;
                 const ny = y + dy;
-                if (isValid(nx, ny) && !visited[nx][ny]) {
+                if (isValid(nx, ny) && !visited[nx][ny] && !this.board[nx][ny].withinBorder) {
                     visited[nx][ny] = true;
                     currentPath.push([nx, ny]);
                     const key = [nx, ny];
@@ -259,7 +259,7 @@ function main() {
             console.log(board[i][j].print());
         }
     }
-    graph.createAisles(board[1][1], board[2][2]);
+    graph.createAisles(board[1][1], board[1][2]);
     console.log("SECOND GO!");
     for (let i = 0; i < board.length; i++) {
         for (let j = 0; j < board[0].length; j++) {
