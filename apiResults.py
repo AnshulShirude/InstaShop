@@ -26,8 +26,6 @@ response_json = api_result.json()
 
 
 product_tcin = response_json["search_results"][0]["product"]["tcin"]
-# print(product_tcin)
-
 
 paramsAisleNumber = {
 'api_key': '0CC42161E0A649A2AC3625E7CE64A56E',
