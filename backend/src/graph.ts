@@ -252,9 +252,9 @@ function main() {
   }
 
   const graph = new Graph(board, edges);
-  //   const result = graph.dfs(0, 0, 2, 2, []);
+  const result = graph.dfs(0, 0, 2, 2, []);
 
-  //   console.log("Result: ", result);
+  console.log("Result: ", result);
 
   console.log(edges.length);
   for (const edge of edges) {

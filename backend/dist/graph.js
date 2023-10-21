@@ -61,8 +61,9 @@ class Graph {
     constructor(board, edges) {
         this.board = board;
         this.edges = edges;
-        this.visited = new Boolean[board.length][board[0].length]();
+        this.visited = new Array(board.length);
         for (let i = 0; i < board.length; i++) {
+            this.visited[i] = new Array(board[0].length);
             for (let j = 0; j < board[0].length; j++) {
                 this.visited[i][j] = false;
             }
