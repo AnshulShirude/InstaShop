@@ -1,18 +1,18 @@
 class Node {
-  x: Number;
-  y: Number;
+  x: number;
+  y: number;
   north: Node;
   south: Node;
   east: Node;
   west: Node;
 
-  constructor(x: Number, y: Number) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
   print() {
-    const neighbors = this.getNeighbors();
+    return "X Coordinate:" + this.x + " Y Coordinate: " + this.y;
   }
 
   getNeighbors() {
@@ -80,55 +80,69 @@ class Graph {
   edges: Edge[];
   // Translate a Ailse Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
+  visited: Node[];
 
   constructor(board: Node[][], edges: Edge[]) {
     this.board = board;
     this.edges = edges;
   }
 
-  createAisles(
-    upperRight: number,
-    upperLeft: number,
-    lowerRight: number,
-    lowerLeft: number
-  ) {
-    for (let i = upperLeft; i < upperRight; i++) {
-      for (let j = lowerLeft; j < lowerRight; j++) {
+  createAisles(upperLeft: Node, lowerRight: Node) {
+    let leftX = upperLeft.x;
+    let rightX = lowerRight.x;
+
+    let northY = upperLeft.y;
+    let southY = lowerRight.y;
+
+    for (let i = leftX; i < rightX; i++) {
+      for (let j = northY; j < southY; j++) {
         const currentNode = this.board[i][j];
 
-        const neighbors = currentNode.getNeighbors();
-
-        for (const edge of this.edges) {
-          for (const Node of neighbors) {
-            if (edge.containsNodes(currentNode, Node)) {
-              this.edges.filter((totalEdges) => totalEdges !== edge);
-            }
-          }
+        // Removing the horizontal edges needed
+        if (i === leftX) {
+          currentNode.east = null;
+        } else if (i === rightX) {
+          currentNode.west = null;
+        } else {
+          currentNode.east = null;
+          currentNode.west = null;
         }
 
-        //i'm thinking like for each neighbor, if edge with either To/From in our list
-
-        // need to remove the edges that reference this cell
-        // need to remove those edges from our edges list since they do not exist
-
-        // with this list of neighbors -> search with edges List,
-        // if we have an edge with corresponding Nodes/ to/From
-
-        //once we find it, remove it from our list,
-        // also need to update what connects
-
-        // ohh i see
-        // ya so if we remove an edge in between to show that a path exists then we need to connect the nodes yes
-        // but if we remove the edge then do we wanna say that there is no path that exists
-        // so like kinda opposite way around thing
-
-        //like removing the edge, so show that there is no path
-        // and with that you need to remove (I think) that Nodes Connections, li
-        // like if we remove a link between two  E -> W , that should not exist?
+        // Removing the vertical edges needed
+        if (j === northY) {
+          currentNode.south = null;
+        } else if (j === southY) {
+          currentNode.north = null;
+        } else {
+          currentNode.north = null;
+          currentNode.south = null;
+        }
       }
     }
   }
 
+  //
+  dfs(
+    board,
+    posXLeft: number,
+    posXRight: number,
+    posYLeft: number,
+    posYRight: number
+  ) {
+    if (
+      posXLeft < 0 ||
+      posXRight >= board.length ||
+      posYLeft < 0 ||
+      posYRight >= board[0].length ||
+      visited[posXLeft][posYLeft]
+    ) {
+      return;
+    }
+  }
+
+  // visited List
+  // start -> grab -> neighbors
+  //
   // eventually add in functionality to add in an item for an aisle
 }
 
@@ -181,17 +195,51 @@ function linkNodes(board: Node[][]) {
   return edges;
 }
 
+function printGrid(graph) {
+  const width = graph.board.length;
+  const height = graph.board[0].length;
+
+  for (let y = 0; y < height; y++) {
+    let row = "";
+    for (let x = 0; x < width; x++) {
+      const node = graph.board[x][y];
+
+      // Display a node with 'O' if present
+      row += "O";
+
+      // Display vertical edges with '|'
+      if (node.south && x === width - 1) {
+        row += "|";
+      } else {
+        row += " ";
+      }
+
+      // Display horizontal edges with '_'
+      if (node.east && y === height - 1) {
+        row += "_";
+      } else {
+        row += " ";
+      }
+    }
+    console.log(row);
+  }
+}
+
 function main() {
   // width, height
-  const board = createBoard(2, 2);
+  const board = createBoard(3, 3);
   const edges = linkNodes(board);
   for (const edge of edges) {
     edge.linkCells();
   }
 
+  const graph = new Graph(board, edges);
+
   console.log(edges.length);
   for (const edge of edges) {
-    console.log(edge.NodeFrom.print());
+    const NodeFromPrint = edge.NodeFrom.print();
+    const NodeToPrint = edge.NodeTo.print();
+    console.log(NodeFromPrint, "-", NodeToPrint);
   }
 
   // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?

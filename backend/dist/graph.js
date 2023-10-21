@@ -4,7 +4,7 @@ class Node {
         this.y = y;
     }
     print() {
-        const neighbors = this.getNeighbors();
+        return "X Coordinate:" + this.x + " Y Coordinate: " + this.y;
     }
     getNeighbors() {
         const NodeList = [];
@@ -74,20 +74,6 @@ class Graph {
                         }
                     }
                 }
-                //i'm thinking like for each neighbor, if edge with either To/From in our list
-                // need to remove the edges that reference this cell
-                // need to remove those edges from our edges list since they do not exist
-                // with this list of neighbors -> search with edges List,
-                // if we have an edge with corresponding Nodes/ to/From
-                //once we find it, remove it from our list,
-                // also need to update what connects
-                // ohh i see
-                // ya so if we remove an edge in between to show that a path exists then we need to connect the nodes yes
-                // but if we remove the edge then do we wanna say that there is no path that exists
-                // so like kinda opposite way around thing
-                //like removing the edge, so show that there is no path
-                // and with that you need to remove (I think) that Nodes Connections, li
-                // like if we remove a link between two  E -> W , that should not exist?
             }
         }
     }
@@ -134,14 +120,17 @@ function linkNodes(board) {
 }
 function main() {
     // width, height
-    const board = createBoard(2, 2);
+    const board = createBoard(3, 3);
     const edges = linkNodes(board);
     for (const edge of edges) {
         edge.linkCells();
     }
+    const graph = new Graph(board, edges);
     console.log(edges.length);
     for (const edge of edges) {
-        console.log(edge.NodeFrom.print());
+        const NodeFromPrint = edge.NodeFrom.print();
+        const NodeToPrint = edge.NodeTo.print();
+        console.log(NodeFromPrint, "-", NodeToPrint);
     }
     // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?
     // at least for a 2-D grid it looks fine, going to focus on removing edges, and see if this causes issues
