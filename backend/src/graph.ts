@@ -80,7 +80,7 @@ class Graph {
   edges: Edge[];
   // Translate a Ailse Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
-  visited: Node[];
+  visited: boolean[][];
 
   constructor(board: Node[][], edges: Edge[]) {
     this.board = board;
@@ -122,19 +122,13 @@ class Graph {
   }
 
   //
-  dfs(
-    board,
-    posXLeft: number,
-    posXRight: number,
-    posYLeft: number,
-    posYRight: number
-  ) {
+  dfs(board: Node[][], posX: number, posY: number) {
     if (
-      posXLeft < 0 ||
-      posXRight >= board.length ||
-      posYLeft < 0 ||
-      posYRight >= board[0].length ||
-      visited[posXLeft][posYLeft]
+      posX < 0 ||
+      posX >= board.length ||
+      posY < 0 ||
+      posY >= board[0].length ||
+      this.visited[posX][posY]
     ) {
       return;
     }
@@ -216,7 +210,7 @@ function printGrid(graph) {
 
       // Display horizontal edges with '_'
       if (node.east && y === height - 1) {
-        row += "_";
+        row += "_–";
       } else {
         row += " ";
       }
