@@ -59,20 +59,3 @@ const Sidebar = ({ children }) => {
 };
 
 export default Sidebar;
-
-
-// import React from 'react';
-// import { NavLink } from 'react-router-dom';
-
-// function Sidebar() {
-//     return (
-//         <div className="sidebar">
-//             <NavLink to="/" activeClassName="active">Home</NavLink>
-//             <NavLink to="/add-items" activeClassName="active">Add Items</NavLink>
-//             <NavLink to="/about-us" activeClassName="active">About Us</NavLink> 
-//             <NavLink to="/map" activeClassName="active">Map</NavLink>
-//         </div>
-//     );
-// }
-
-// export default Sidebar;

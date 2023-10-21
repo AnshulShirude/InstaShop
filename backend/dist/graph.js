@@ -167,21 +167,7 @@ function linkNodes(board) {
     }
     return edges;
 }
-function drawGraph(graph) {
-    const mazeContainer = document.getElementById("maze-container");
-    for (let i = 0; i < graph.board.length; i++) {
-        const mazeRow = document.createElement("div");
-        for (let j = 0; j < graph.board[i].length; j++) {
-            const mazeBox = document.createElement("div");
-            mazeBox.style.width = "20px";
-            mazeBox.style.height = "20px";
-            mazeBox.style.border = "1px solid black";
-            mazeBox.style.backgroundColor = "white";
-            mazeRow.appendChild(mazeBox);
-        }
-        mazeContainer.appendChild(mazeRow);
-    }
-}
+
 function main() {
     // width, height
     const board = createBoard(5, 5);
