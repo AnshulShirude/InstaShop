@@ -56,19 +56,6 @@ class Graph {
     constructor(board, edges) {
         this.board = board;
         this.edges = edges;
-        this.itemTranslation = new Map();
-    }
-    inputAisleToNode(aisle, node) {
-        this.itemTranslation.set(aisle, node);
-    }
-    ;
-    createAisles(upperLeft, lowerRight) {
-        let leftX = upperLeft.x;
-        let rightX = lowerRight.x;
-        let northY = upperLeft.y;
-        let southY = lowerRight.y;
-        for (let i = leftX; i < rightX; i++) {
-            for (let j = northY; j < southY; j++) {
         this.visited = new Array(board.length);
         for (let i = 0; i < board.length; i++) {
             this.visited[i] = new Array(board[0].length);
@@ -85,81 +72,6 @@ class Graph {
         for (let i = leftX; i < rightX; i++) {
             for (let j = northY; j < southY; j++) {
                 const currentNode = this.board[i][j];
-                // Removing the horizontal edges needed
-                if (i === leftX) {
-                    currentNode.east = null;
-                }
-                else if (i === rightX) {
-                    currentNode.west = null;
-                }
-                else {
-                    currentNode.east = null;
-                    currentNode.west = null;
-                }
-                // Removing the vertical edges needed
-                if (j === northY) {
-                    currentNode.south = null;
-                }
-                else if (j === southY) {
-                    currentNode.north = null;
-                }
-                else {
-                    currentNode.north = null;
-                    currentNode.south = null;
-                }
-            }
-        }
-    }
-    getShortestPath(nodesToCover) {
-        const m = this.board.length;
-        const n = this.board[0].length;
-        const start = this.board[m - 1][n - 1];
-        const end = this.board[m - 1][0];
-        const visited = new Array(m).fill(false).map(() => new Array(n).fill(false));
-        const directions = [
-            { dx: 0, dy: 1 },
-            { dx: 1, dy: 0 },
-            { dx: 0, dy: -1 },
-            { dx: -1, dy: 0 }
-        ];
-        const isValid = (x, y) => x >= 0 && x < m && y >= 0 && y < n;
-        const bestPathLen = [Infinity];
-        let bestPathNodes = [];
-        const backtrack = (node, covered, pathLen, currentPath) => {
-            if (node === end && covered.size === nodesToCover.length) {
-                if (pathLen < bestPathLen[0]) {
-                    bestPathLen[0] = pathLen;
-                    bestPathNodes = currentPath.slice();
-                }
-                return;
-            }
-            if (pathLen >= bestPathLen[0]) {
-                return;
-            }
-            for (const { dx, dy } of directions) {
-                const nx = node.x + dx;
-                const ny = node.y + dy;
-                if (isValid(nx, ny) && !visited[nx][ny]) {
-                    visited[nx][ny] = true;
-                    const nextNode = this.board[nx][ny];
-                    currentPath.push(nextNode);
-                    const nextCovered = new Set(covered);
-                    if (nodesToCover.some(target => target.x === nx && target.y === ny)) {
-                        nextCovered.add(nextNode);
-                    }
-                    backtrack(nextNode, nextCovered, pathLen + 1, currentPath);
-                    currentPath.pop();
-                    visited[nx][ny] = false;
-                }
-            }
-        };
-        visited[start.x][start.y] = true;
-        backtrack(start, new Set(), 0, [start]);
-        if (bestPathLen[0] !== Infinity) {
-            return bestPathNodes;
-        }
-        else {
-            return null;
                 // Removing the horizontal edges needed
                 if (i === leftX) {
                     currentNode.east = null;
@@ -255,33 +167,6 @@ function linkNodes(board) {
     }
     return edges;
 }
-function printGrid(graph) {
-    const width = graph.board.length;
-    const height = graph.board[0].length;
-    for (let y = 0; y < height; y++) {
-        let row = "";
-        for (let x = 0; x < width; x++) {
-            const node = graph.board[x][y];
-            // Display a node with 'O' if present
-            row += "O";
-            // Display vertical edges with '|'
-            if (node.south && x === width - 1) {
-                row += "|";
-            }
-            else {
-                row += " ";
-            }
-            // Display horizontal edges with '_'
-            if (node.east && y === height - 1) {
-                row += "_";
-            }
-            else {
-                row += " ";
-            }
-        }
-        console.log(row);
-    }
-}
 function drawGraph(graph) {
     const mazeContainer = document.getElementById("maze-container");
     for (let i = 0; i < graph.board.length; i++) {
@@ -313,23 +198,6 @@ function main() {
         const NodeToPrint = edge.NodeTo.print();
         console.log(NodeFromPrint, "-", NodeToPrint);
     }
-    let a = new Node(0, 0);
-    let b = new Node(2, 3);
-    let c = new Node(3, 4);
-    let d = new Node(4, 4);
-    const shortestPath = graph.getShortestPath([a, b, c, d]); // Example coordinates, modify as needed
-    if (shortestPath) {
-        console.log("Shortest Path:");
-        shortestPath.forEach(node => {
-            console.log(node.print());
-        });
-    }
-    else {
-        console.log("No path found.");
-    }
-    // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?
-    // at least for a 2-D grid it looks fine, going to focus on removing edges, and see if this causes issues
-    // I hope its just an issue within printing with for each loops, but idk
 }
 main();
 export { Graph, createBoard, linkNodes };
