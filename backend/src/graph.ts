@@ -81,10 +81,19 @@ class Graph {
   // Translate a Aisle Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
   visited: boolean[][];
+  pathFound: boolean;
 
   constructor(board: Node[][], edges: Edge[]) {
     this.board = board;
     this.edges = edges;
+    this.visited = new Array(board.length);
+
+    for (let i = 0; i < board.length; i++) {
+      this.visited[i] = new Array(board[0].length);
+      for (let j = 0; j < board[0].length; j++) {
+        this.visited[i][j] = false;
+      }
+    }
   }
 
   createAisles(upperLeft: Node, lowerRight: Node) {
@@ -121,34 +130,50 @@ class Graph {
     }
   }
 
-  dfs(board: Node[][], startingPosX: number, startingPosY: number) {
+  // List of Nodes Return Type
+  dfs(
+    currentPosX: number,
+    currentPosY: number,
+    endingPosX: number,
+    endingPosY: number,
+    path: Node[]
+  ) {
+    if (currentPosX === endingPosX && currentPosY === endingPosY) {
+      this.pathFound = true;
+      return path;
+    }
+
     if (
-      posX < 0 ||
-      posX >= board.length ||
-      posY < 0 ||
-      posY >= board[0].length ||
-      this.visited[posX][posY]
+      currentPosX < 0 ||
+      currentPosX >= this.board.length ||
+      currentPosY < 0 ||
+      currentPosY >= this.board[0].length ||
+      this.visited[currentPosX][currentPosY]
     ) {
       return;
     }
-    this.visited[posX][posY] = true;
 
-    // Call DFS recursively on the adjacent nodes
-    const directions = [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-    ];
-    for (let dir of directions) {
-      const newX = posX + dir[0];
-      const newY = posY + dir[1];
-      this.dfs(board, newX, newY);
+    this.visited[currentPosX][currentPosY] = true;
+
+    const currentNode = this.board[currentPosX][currentPosY];
+    // here we add the logic for if we can go left, right, up, or bottom
+    const outNeighbors = currentNode.getNeighbors();
+    for (const node of outNeighbors) {
+      const newPath = [...path];
+      newPath.push(node);
+
+      // Recursive call with the new path
+      const result = this.dfs(node.x, node.y, endingPosX, endingPosY, newPath);
+
+      if (result) {
+        // If the path is found in the recursive call, return it
+        return result;
+      }
     }
   }
-
-  // eventually add in functionality to add in an item for an aisle
 }
+
+// eventually add in functionality to add in an item for an aisl
 
 function createBoard(width: number, height: number) {
   let board = [];
@@ -199,33 +224,22 @@ function linkNodes(board: Node[][]) {
   return edges;
 }
 
-function printGrid(graph) {
-  const width = graph.board.length;
-  const height = graph.board[0].length;
+function drawGraph(graph: Graph): void {
+  const mazeContainer = document.getElementById("maze-container");
 
-  for (let y = 0; y < height; y++) {
-    let row = "";
-    for (let x = 0; x < width; x++) {
-      const node = graph.board[x][y];
+  for (let i = 0; i < graph.board.length; i++) {
+    const mazeRow = document.createElement("div");
 
-      // Display a node with 'O' if present
-      row += "O";
-
-      // Display vertical edges with '|'
-      if (node.south && x === width - 1) {
-        row += "|";
-      } else {
-        row += " ";
-      }
-
-      // Display horizontal edges with '_'
-      if (node.east && y === height - 1) {
-        row += "_–";
-      } else {
-        row += " ";
-      }
+    for (let j = 0; j < graph.board[i].length; j++) {
+      const mazeBox = document.createElement("div");
+      mazeBox.style.width = "20px";
+      mazeBox.style.height = "20px";
+      mazeBox.style.border = "1px solid black";
+      mazeBox.style.backgroundColor = "white";
+      mazeRow.appendChild(mazeBox);
     }
-    console.log(row);
+
+    mazeContainer.appendChild(mazeRow);
   }
 }
 
@@ -238,6 +252,9 @@ function main() {
   }
 
   const graph = new Graph(board, edges);
+  //   const result = graph.dfs(0, 0, 2, 2, []);
+
+  //   console.log("Result: ", result);
 
   console.log(edges.length);
   for (const edge of edges) {
@@ -250,15 +267,3 @@ function main() {
 main();
 
 export { Graph, createBoard, linkNodes };
-
-// const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
-// const context = canvas.getContext("2d");
-
-// function drawLine(x1: number, y1: number, x2: number, y2: number) {
-//   if (context) {
-//     context.beginPath();
-//     context.moveTo(x1, y1);
-//     context.lineTo(x2, y2);
-//     context.stroke();
-//   }
-// }

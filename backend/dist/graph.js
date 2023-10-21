@@ -61,23 +61,76 @@ class Graph {
     constructor(board, edges) {
         this.board = board;
         this.edges = edges;
+        this.visited = new Boolean[board.length][board[0].length]();
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[0].length; j++) {
+                this.visited[i][j] = false;
+            }
+        }
     }
-    createAisles(upperRight, upperLeft, lowerRight, lowerLeft) {
-        for (let i = upperLeft; i < upperRight; i++) {
-            for (let j = lowerLeft; j < lowerRight; j++) {
+    createAisles(upperLeft, lowerRight) {
+        let leftX = upperLeft.x;
+        let rightX = lowerRight.x;
+        let northY = upperLeft.y;
+        let southY = lowerRight.y;
+        for (let i = leftX; i < rightX; i++) {
+            for (let j = northY; j < southY; j++) {
                 const currentNode = this.board[i][j];
-                const neighbors = currentNode.getNeighbors();
-                for (const edge of this.edges) {
-                    for (const Node of neighbors) {
-                        if (edge.containsNodes(currentNode, Node)) {
-                            this.edges.filter((totalEdges) => totalEdges !== edge);
-                        }
-                    }
+                // Removing the horizontal edges needed
+                if (i === leftX) {
+                    currentNode.east = null;
+                }
+                else if (i === rightX) {
+                    currentNode.west = null;
+                }
+                else {
+                    currentNode.east = null;
+                    currentNode.west = null;
+                }
+                // Removing the vertical edges needed
+                if (j === northY) {
+                    currentNode.south = null;
+                }
+                else if (j === southY) {
+                    currentNode.north = null;
+                }
+                else {
+                    currentNode.north = null;
+                    currentNode.south = null;
                 }
             }
         }
     }
+    // List of Nodes Return Type
+    dfs(currentPosX, currentPosY, endingPosX, endingPosY, path) {
+        if (currentPosX === endingPosX && currentPosY === endingPosY) {
+            this.pathFound = true;
+            return path;
+        }
+        if (currentPosX < 0 ||
+            currentPosX >= this.board.length ||
+            currentPosY < 0 ||
+            currentPosY >= this.board[0].length ||
+            this.visited[currentPosX][currentPosY]) {
+            return;
+        }
+        this.visited[currentPosX][currentPosY] = true;
+        const currentNode = this.board[currentPosX][currentPosY];
+        // here we add the logic for if we can go left, right, up, or bottom
+        const outNeighbors = currentNode.getNeighbors();
+        for (const node of outNeighbors) {
+            const newPath = [...path];
+            newPath.push(node);
+            // Recursive call with the new path
+            const result = this.dfs(node.x, node.y, endingPosX, endingPosY, newPath);
+            if (result) {
+                // If the path is found in the recursive call, return it
+                return result;
+            }
+        }
+    }
 }
+// eventually add in functionality to add in an item for an aisl
 function createBoard(width, height) {
     let board = [];
     //create the 2D Grid
@@ -118,6 +171,21 @@ function linkNodes(board) {
     }
     return edges;
 }
+function drawGraph(graph) {
+    const mazeContainer = document.getElementById("maze-container");
+    for (let i = 0; i < graph.board.length; i++) {
+        const mazeRow = document.createElement("div");
+        for (let j = 0; j < graph.board[i].length; j++) {
+            const mazeBox = document.createElement("div");
+            mazeBox.style.width = "20px";
+            mazeBox.style.height = "20px";
+            mazeBox.style.border = "1px solid black";
+            mazeBox.style.backgroundColor = "white";
+            mazeRow.appendChild(mazeBox);
+        }
+        mazeContainer.appendChild(mazeRow);
+    }
+}
 function main() {
     // width, height
     const board = createBoard(3, 3);
@@ -126,26 +194,15 @@ function main() {
         edge.linkCells();
     }
     const graph = new Graph(board, edges);
+    const result = graph.dfs(0, 0, 2, 2, []);
+    console.log("Result: ", result);
     console.log(edges.length);
     for (const edge of edges) {
         const NodeFromPrint = edge.NodeFrom.print();
         const NodeToPrint = edge.NodeTo.print();
         console.log(NodeFromPrint, "-", NodeToPrint);
     }
-    // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?
-    // at least for a 2-D grid it looks fine, going to focus on removing edges, and see if this causes issues
-    // I hope its just an issue within printing with for each loops, but idk
 }
 main();
 export { Graph, createBoard, linkNodes };
-// const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
-// const context = canvas.getContext("2d");
-// function drawLine(x1: number, y1: number, x2: number, y2: number) {
-//   if (context) {
-//     context.beginPath();
-//     context.moveTo(x1, y1);
-//     context.lineTo(x2, y2);
-//     context.stroke();
-//   }
-// }
 //# sourceMappingURL=graph.js.map
