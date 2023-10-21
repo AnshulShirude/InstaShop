@@ -4,7 +4,7 @@ import json
 itemName = input("Enter Item name: ")
 # set up the request parameters
 params = {
-'api_key': '0CC42161E0A649A2AC3625E7CE64A56E',
+'api_key': '4BDF229276F14793892B4826A3EDEBCB',
   'search_term': itemName,
   'type': 'search',
   'customer_zipcode': '02215',
