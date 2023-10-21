@@ -66,12 +66,6 @@ class Edge {
     }
   }
 
-  containsNodes(node1: Node, node2: Node) {
-    const first = this.NodeFrom === node1 || this.NodeTo === node1;
-    const second = this.NodeFrom === node2 || this.NodeTo === node2;
-
-    return first && second;
-  }
 }
 
 class Graph {
@@ -80,12 +74,17 @@ class Graph {
   edges: Edge[];
   // Translate a Ailse Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
-  visited: Node[];
+  visited: boolean[][];
 
   constructor(board: Node[][], edges: Edge[]) {
     this.board = board;
     this.edges = edges;
+    this.itemTranslation = new Map();
   }
+
+  inputAisleToNode(aisle: string, node :Node) {
+    this.itemTranslation.set(aisle, node);
+  };
 
   createAisles(upperLeft: Node, lowerRight: Node) {
     let leftX = upperLeft.x;
@@ -121,29 +120,62 @@ class Graph {
     }
   }
 
-  //
-  dfs(
-    board,
-    posXLeft: number,
-    posXRight: number,
-    posYLeft: number,
-    posYRight: number
-  ) {
-    if (
-      posXLeft < 0 ||
-      posXRight >= board.length ||
-      posYLeft < 0 ||
-      posYRight >= board[0].length ||
-      visited[posXLeft][posYLeft]
-    ) {
-      return;
+  getShortestPath(nodesToCover: Node[]): Node[] | null {
+    const m = this.board.length;
+    const n = this.board[0].length;
+    const start = this.board[m - 1][n - 1];
+    const end = this.board[m - 1][0];
+    const visited = new Array(m).fill(false).map(() => new Array(n).fill(false));
+    const directions = [
+      { dx: 0, dy: 1 },
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: -1 },
+      { dx: -1, dy: 0 }
+    ];
+  
+    const isValid = (x: number, y: number) => x >= 0 && x < m && y >= 0 && y < n;
+  
+    const bestPathLen = [Infinity];
+    let bestPathNodes: Node[] = [];
+  
+    const backtrack = (node: Node, covered: Set<Node>, pathLen: number, currentPath: Node[]) => {
+      if (node === end && covered.size === nodesToCover.length) {
+        if (pathLen < bestPathLen[0]) {
+          bestPathLen[0] = pathLen;
+          bestPathNodes = currentPath.slice();
+        }
+        return;
+      }
+      if (pathLen >= bestPathLen[0]) {
+        return;
+      }
+      for (const { dx, dy } of directions) {
+        const nx = node.x + dx;
+        const ny = node.y + dy;
+        if (isValid(nx, ny) && !visited[nx][ny]) {
+          visited[nx][ny] = true;
+          const nextNode = this.board[nx][ny];
+          currentPath.push(nextNode);
+          const nextCovered = new Set(covered);
+          if (nodesToCover.some(target => target.x === nx && target.y === ny)) {
+            nextCovered.add(nextNode);
+          }
+          backtrack(nextNode, nextCovered, pathLen + 1, currentPath);
+          currentPath.pop();
+          visited[nx][ny] = false;
+        }
+      }
+    };
+  
+    visited[start.x][start.y] = true;
+    backtrack(start, new Set(), 0, [start]);
+  
+    if (bestPathLen[0] !== Infinity) {
+      return bestPathNodes;
+    } else {
+      return null;
     }
   }
-
-  // visited List
-  // start -> grab -> neighbors
-  //
-  // eventually add in functionality to add in an item for an aisle
 }
 
 function createBoard(width: number, height: number) {
@@ -227,7 +259,7 @@ function printGrid(graph) {
 
 function main() {
   // width, height
-  const board = createBoard(3, 3);
+  const board = createBoard(5, 5);
   const edges = linkNodes(board);
   for (const edge of edges) {
     edge.linkCells();
@@ -240,6 +272,20 @@ function main() {
     const NodeFromPrint = edge.NodeFrom.print();
     const NodeToPrint = edge.NodeTo.print();
     console.log(NodeFromPrint, "-", NodeToPrint);
+  }
+  let a = new Node(0, 0);
+  let b = new Node(2, 3);
+  let c = new Node(3, 4);
+  let d = new Node(4, 4);
+
+  const shortestPath = graph.getShortestPath([a, b, c, d]);
+  if (shortestPath) {
+    console.log("Shortest Path:");
+    shortestPath.forEach(node => {
+      console.log(node.print());
+    });
+  } else {
+    console.log("No path found.");
   }
 
   // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?
