@@ -78,7 +78,7 @@ class Graph {
   board: Node[][];
   // list of edges
   edges: Edge[];
-  // Translate a Ailse Name to A Node in a Graph
+  // Translate a Aisle Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
   visited: boolean[][];
 
@@ -121,8 +121,7 @@ class Graph {
     }
   }
 
-  //
-  dfs(board: Node[][], posX: number, posY: number) {
+  dfs(board: Node[][], startingPosX: number, startingPosY: number) {
     if (
       posX < 0 ||
       posX >= board.length ||
@@ -132,11 +131,22 @@ class Graph {
     ) {
       return;
     }
+    this.visited[posX][posY] = true;
+
+    // Call DFS recursively on the adjacent nodes
+    const directions = [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ];
+    for (let dir of directions) {
+      const newX = posX + dir[0];
+      const newY = posY + dir[1];
+      this.dfs(board, newX, newY);
+    }
   }
 
-  // visited List
-  // start -> grab -> neighbors
-  //
   // eventually add in functionality to add in an item for an aisle
 }
 
@@ -235,10 +245,6 @@ function main() {
     const NodeToPrint = edge.NodeTo.print();
     console.log(NodeFromPrint, "-", NodeToPrint);
   }
-
-  // legit no idea, the rest of the data looks fine, it may be with how I print it I guess?
-  // at least for a 2-D grid it looks fine, going to focus on removing edges, and see if this causes issues
-  // I hope its just an issue within printing with for each loops, but idk
 }
 
 main();
