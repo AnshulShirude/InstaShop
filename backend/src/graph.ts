@@ -369,9 +369,9 @@ function linkNodes(board: Node[][]) {
 
   const path = graph1.shortestPathBFS(startNode, endNode, nodesToCover);
   console.log(`Shortest path length: ${path.length}`);
-  const pathCoords = [];
+  const pathCoords = new Set();
   for (let node of path) {
-    pathCoords.push([node.x, node.y])
+    pathCoords.add([node.x, node.y])
   }
   console.log('Path:', pathCoords);
 
