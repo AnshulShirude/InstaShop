@@ -3,7 +3,8 @@ import { NodesContext } from "../App";
 import { Graph, createBoard, linkNodes } from "../GraphLogic/graph";
 
 export default function MasterGraph(props) {
-  const { aisleNumbers } = props;
+  const { nodes } = useContext(NodesContext);
+  // const { aisleNumbers } = props;
 
   const board = createBoard(80, 20);
   console.log(board);
@@ -144,7 +145,7 @@ export default function MasterGraph(props) {
   const endNode = graph.getNode(73, 2);
 
   const nodesToCover = [];
-  for (const aisle of aisleNumbers) {
+  for (const aisle of nodes) {
     const node = graph.itemTranslation.get(aisle);
     nodesToCover.push(node);
   }
