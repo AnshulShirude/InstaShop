@@ -25,9 +25,9 @@ const Sidebar = ({ children }) => {
   return (
     <div className="sidebar_container">
       <div className={`sidebar`}>
+        <div className="title">InstaShop</div>
         {menuItem.map((item) => (
           <NavLink key={item.name} to={item.path} className="link">
-            <div className="icon">{item.icon}</div>
             {<span className="link_text">{item.name}</span>}
           </NavLink>
         ))}
