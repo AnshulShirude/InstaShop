@@ -6,6 +6,7 @@ class Node {
         this.east = undefined;
         this.west = undefined;
         this.south = undefined;
+        this.withinBorder = false;
     }
     print() {
         const neighbors = this.getNeighbors();
@@ -73,6 +74,10 @@ class Graph {
                 this.visited[i][j] = false;
             }
         }
+    }
+    // adds an item on our Map to represent a Node
+    createTransalation(aisleName, node) {
+        this.itemTranslation.set(aisleName, node);
     }
     createAisles(upperLeft, lowerRight) {
         let leftX = upperLeft.x;
@@ -167,7 +172,9 @@ class Graph {
             for (const [dx, dy] of directions) {
                 const nx = x + dx;
                 const ny = y + dy;
-                if (isValid(nx, ny) && !visited[nx][ny] && !this.board[nx][ny].withinBorder) {
+                if (isValid(nx, ny) &&
+                    !visited[nx][ny] &&
+                    !this.board[nx][ny].withinBorder) {
                     visited[nx][ny] = true;
                     currentPath.push([nx, ny]);
                     const key = [nx, ny];
@@ -248,21 +255,6 @@ function drawGraph(graph) {
         mazeContainer.appendChild(mazeRow);
     }
 }
-function drawGraph(graph) {
-    const mazeContainer = document.getElementById("maze-container");
-    for (let i = 0; i < graph.board.length; i++) {
-        const mazeRow = document.createElement("div");
-        for (let j = 0; j < graph.board[i].length; j++) {
-            const mazeBox = document.createElement("div");
-            mazeBox.style.width = "20px";
-            mazeBox.style.height = "20px";
-            mazeBox.style.border = "1px solid black";
-            mazeBox.style.backgroundColor = "white";
-            mazeRow.appendChild(mazeBox);
-        }
-        mazeContainer.appendChild(mazeRow);
-    }
-}
 function main() {
     // width, height
     const board = createBoard(4, 4);
@@ -306,5 +298,5 @@ function main() {
     // }
 }
 main();
-export { Graph, createBoard, linkNodes };
+export { Graph, Node, Edge, createBoard, linkNodes };
 //# sourceMappingURL=graph.js.map

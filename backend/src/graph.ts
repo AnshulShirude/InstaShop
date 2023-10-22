@@ -393,4 +393,4 @@ function main() {
 
 main();
 
-export { Graph, createBoard, linkNodes };
+export { Graph, Node, Edge, createBoard, linkNodes };
