@@ -6,18 +6,22 @@ import {
   BsMap,
 } from "react-icons/bs";
 import React, { useState } from "react";
+import { useContext } from "react";
+import { NodesContext } from "../App";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 const Sidebar = ({ children }) => {
+  const { nodes } = useContext(NodesContext);
   const [isOpen, setIsOpen] = useState(false);
   //   const toggle = () => setIsOpen(!isOpen);
 
   const menuItem = [
     { name: "HomePage", path: "/", icon: <BsFillHouseDoorFill /> },
     { name: "AddItems", path: "/add-items", icon: <BsPlus /> },
-    { name: "MapPage", path: "/map", icon: <BsMap /> },
   ];
+
+  nodes && menuItem.push({ name: "MapPage", path: "/map", icon: <BsMap /> });
   return (
     <div className="sidebar_container">
       <div className={`sidebar`}>

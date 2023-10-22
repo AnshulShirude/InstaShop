@@ -1,6 +1,10 @@
+import React, { useContext } from "react";
+import { NodesContext } from "../App";
 import { Graph, createBoard, linkNodes } from "../GraphLogic/graph";
 
 export default function MasterGraph() {
+  const { nodes } = useContext(NodesContext);
+  console.log("nodes that we found", nodes);
   const board = createBoard(80, 20);
   console.log(board);
   const edges = linkNodes(board);
@@ -140,12 +144,11 @@ export default function MasterGraph() {
   const endNode = graph.getNode(73, 2);
 
   // const nodesToCover = Array.from(graph.itemTranslation.values());
-  const nodesToCover = [
-    graph.getNode(25, 4),
-    graph.getNode(8, 14),
-    graph.getNode(36, 17),
-    graph.getNode(69, 16),
-  ];
+  const nodesToCover = [];
+  for (const aisle of nodes) {
+    const node = graph.itemTranslation.get(aisle);
+    nodesToCover.push(node);
+  }
 
   const path = graph.shortestPathBFS(startNode, endNode, nodesToCover);
   console.log(`Shortest path length: ${path.length}`);
