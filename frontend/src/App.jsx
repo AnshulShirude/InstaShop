@@ -17,7 +17,7 @@ function App() {
                   <Routes>
                       <Route path="/" element={<HomePage/>} />
                       <Route path="/add-items" element={<AddItems />} />
-                      <Route path="/about-us" element={<AboutUs/>} /> {/* Replace with your AboutUs component if you have it */}
+                      <Route path="/about-us" element={<AboutUs/>} /> 
                       <Route path="/map" element={<MapPage />} />
                   </Routes>
               </div>
