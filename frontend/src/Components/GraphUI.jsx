@@ -2,7 +2,7 @@ import {Graph, Node, Edge, linkNodes, createBoard} from "../GraphLogic/graph"
 
 export default function GraphUI() {
 
-    const board = createBoard(20, 20);
+    const board = createBoard(10, 10);
     console.log(board);
     const edges = linkNodes(board);
     for (const edge of edges) {
@@ -11,14 +11,6 @@ export default function GraphUI() {
 
     const graph = new Graph(board, edges);
     const graphData = [];
-
-    graph.board[0][0].east = null;
-    graph.board[0][1].west = null;
-
-    const cellStyle = {
-        width: '40px', 
-        height: '40px',         
-    };
 
     for (let j = 0; j < graph.board[0].length; j++) {
 
@@ -31,7 +23,9 @@ export default function GraphUI() {
             const bottomBorderColor = currNode.south ? "white" : "black";
             const rightBorderColor = currNode.east ? "white" : "black";
 
-            const borders = {
+            const cellStyle = {
+                width: '40px', 
+                height: '40px', 
                 borderLeft: `1px solid ${leftBorderColor}`,
                 borderRight: `1px solid ${rightBorderColor}`,
                 borderTop: `1px solid ${topBorderColor}`,
@@ -39,7 +33,7 @@ export default function GraphUI() {
             };
 
             row.push(
-                <div key={`${i}-${j}`} className="cell" style={{...cellStyle, ...borders}}>
+                <div key={`${i}-${j}`} className="cell" style={cellStyle}>
                     o
                 </div>
             );
