@@ -2,9 +2,15 @@ class Node {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.withinBorder = false;
     }
     print() {
-        return "X Coordinate:" + this.x + " Y Coordinate: " + this.y;
+        const neighbors = this.getNeighbors();
+        let string = "Postion: (" + this.x + "," + this.y + ")" + " Neighbors :";
+        for (const neighbor of neighbors) {
+            string += "(" + neighbor.x + "," + neighbor.y + ")";
+        }
+        return string;
     }
     getNeighbors() {
         const NodeList = [];
@@ -57,6 +63,7 @@ class Graph {
         this.board = board;
         this.edges = edges;
         this.visited = new Array(board.length);
+        this.itemTranslation = new Map();
         for (let i = 0; i < board.length; i++) {
             this.visited[i] = new Array(board[0].length);
             for (let j = 0; j < board[0].length; j++) {
@@ -69,30 +76,32 @@ class Graph {
         let rightX = lowerRight.x;
         let northY = upperLeft.y;
         let southY = lowerRight.y;
-        for (let i = leftX; i < rightX; i++) {
-            for (let j = northY; j < southY; j++) {
+        for (let i = leftX; i <= rightX; i++) {
+            for (let j = northY; j <= southY; j++) {
                 const currentNode = this.board[i][j];
+                currentNode.withinBorder = true;
                 // Removing the horizontal edges needed
                 if (i === leftX) {
-                    currentNode.east = null;
-                }
-                else if (i === rightX) {
+                    //unhook the upperNode
+                    const prevLeftNode = this.board[i - 1][j];
+                    prevLeftNode.east = null;
                     currentNode.west = null;
                 }
-                else {
+                if (i === rightX) {
+                    //unhook the upperNode
+                    const forwardRightNode = this.board[i + 1][j];
+                    forwardRightNode.west = null;
                     currentNode.east = null;
-                    currentNode.west = null;
                 }
-                // Removing the vertical edges needed
+                if (j === southY) {
+                    const prevBelowNode = this.board[i][j + 1];
+                    prevBelowNode.north = null;
+                    currentNode.south = null;
+                }
                 if (j === northY) {
-                    currentNode.south = null;
-                }
-                else if (j === southY) {
+                    const forwardBelowNode = this.board[i][j - 1];
+                    forwardBelowNode.south = null;
                     currentNode.north = null;
-                }
-                else {
-                    currentNode.north = null;
-                    currentNode.south = null;
                 }
             }
         }
@@ -123,6 +132,60 @@ class Graph {
                 // If the path is found in the recursive call, return it
                 return result;
             }
+        }
+    }
+    shortestPath(matrix, nodesToCover) {
+        const m = matrix.length;
+        const n = matrix[0].length;
+        const start = [m - 1, n - 1];
+        const end = [0, n - 1];
+        const visited = Array.from({ length: m }, () => Array(n).fill(false));
+        const directions = [
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0],
+        ];
+        let bestPathLen = Infinity;
+        let bestPathNodes = [];
+        const isValid = (x, y) => 0 <= x && x < m && 0 <= y && y < n;
+        const backtrack = (x, y, covered, pathLen, currentPath) => {
+            if (x === end[0] &&
+                y === end[1] &&
+                covered.size === nodesToCover.length) {
+                if (pathLen < bestPathLen) {
+                    bestPathLen = pathLen;
+                    bestPathNodes = [...currentPath];
+                }
+                return;
+            }
+            if (pathLen >= bestPathLen)
+                return;
+            for (const [dx, dy] of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (isValid(nx, ny) && !visited[nx][ny] && !this.board[nx][ny].withinBorder) {
+                    visited[nx][ny] = true;
+                    currentPath.push([nx, ny]);
+                    const key = [nx, ny];
+                    if (nodesToCover.some((node) => node[0] === nx && node[1] === ny)) {
+                        backtrack(nx, ny, new Set(covered).add(key), pathLen + 1, currentPath);
+                    }
+                    else {
+                        backtrack(nx, ny, covered, pathLen + 1, currentPath);
+                    }
+                    currentPath.pop();
+                    visited[nx][ny] = false;
+                }
+            }
+        };
+        visited[start[0]][start[1]] = true;
+        backtrack(start[0], start[1], new Set(), 0, [start]);
+        if (bestPathLen !== Infinity) {
+            return [bestPathLen, bestPathNodes];
+        }
+        else {
+            return [null, []];
         }
     }
 }
@@ -167,23 +230,62 @@ function linkNodes(board) {
     }
     return edges;
 }
-
+function drawGraph(graph) {
+    const mazeContainer = document.getElementById("maze-container");
+    for (let i = 0; i < graph.board.length; i++) {
+        const mazeRow = document.createElement("div");
+        for (let j = 0; j < graph.board[i].length; j++) {
+            const mazeBox = document.createElement("div");
+            mazeBox.style.width = "20px";
+            mazeBox.style.height = "20px";
+            mazeBox.style.border = "1px solid black";
+            mazeBox.style.backgroundColor = "white";
+            mazeRow.appendChild(mazeBox);
+        }
+        mazeContainer.appendChild(mazeRow);
+    }
+}
 function main() {
     // width, height
-    const board = createBoard(5, 5);
+    const board = createBoard(4, 4);
     const edges = linkNodes(board);
     for (const edge of edges) {
         edge.linkCells();
     }
+    console.log("FIRST GO!");
     const graph = new Graph(board, edges);
-    const result = graph.dfs(0, 0, 2, 2, []);
-    console.log("Result: ", result);
-    console.log(edges.length);
-    for (const edge of edges) {
-        const NodeFromPrint = edge.NodeFrom.print();
-        const NodeToPrint = edge.NodeTo.print();
-        console.log(NodeFromPrint, "-", NodeToPrint);
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[0].length; j++) {
+            console.log(board[i][j].print());
+        }
     }
+    graph.createAisles(board[1][1], board[1][2]);
+    console.log("SECOND GO!");
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[0].length; j++) {
+            console.log(board[i][j].print());
+        }
+    }
+    const matrix = Array(4)
+        .fill(null)
+        .map(() => Array(4).fill(0)); // Properly initialize the matrix
+    const nodesToCover = [
+        [0, 0],
+        [3, 0],
+        [0, 1],
+        [0, 2],
+        [2, 1],
+    ];
+    const [distance, path] = graph.shortestPath(matrix, nodesToCover);
+    console.log("Distance", distance);
+    console.log("Path", path);
+    // console.log("Result: ", result);
+    // console.log(edges.length);
+    // for (const edge of edges) {
+    //   const NodeFromPrint = edge.NodeFrom.print();
+    //   const NodeToPrint = edge.NodeTo.print();
+    //   console.log(NodeFromPrint, "-", NodeToPrint);
+    // }
 }
 main();
 export { Graph, createBoard, linkNodes };
