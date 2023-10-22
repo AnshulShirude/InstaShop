@@ -5,30 +5,48 @@ import { NavLink } from 'react-router-dom';
 
 function AddItems() {
     const [inputValue, setInputValue] = useState('');
-  const [storedValues, setStoredValues] = useState([]);
-  const [loading, setLoading] = useState(false);
+    const [storedValues, setStoredValues] = useState([]);
+    const [loading, setLoading] = useState(false);
   
+    // Local Dictionary/Map of foods and their aisle numbers
+    const foodAisleMap = {
+        "apple": "Aisle 1",
+        "bread": "Aisle 2",
+        // ... add more items and their aisles here
+    };
 
-  const handleInputChange = event => {
-    setInputValue(event.target.value);
+    const handleInputChange = event => {
+        setInputValue(event.target.value);
+    };
+
+    const handleSubmit = () => {
+      if (inputValue.trim() !== '') {
+          // Check if the item exists in the local dictionary
+          if (foodAisleMap[inputValue]) {
+              setStoredValues(prevValues => [...prevValues, {
+                  inputValue,
+                  itemName: inputValue,
+                  aisleNumber: foodAisleMap[inputValue],
+                  loading: false
+              }]);
+              setInputValue('');
+          } else {
+              const newValue = {
+                  inputValue,
+                  itemName: '',
+                  aisleNumber: '',
+                  loading: true
+              };
+    
+              setStoredValues(prevValues => [...prevValues, newValue]);
+              setInputValue('');
+    
+              // Fetch data from API if not in local dictionary
+              fetchData(newValue, storedValues.length);
+          }
+      }
   };
 
-  const handleSubmit = () => {
-    if (inputValue.trim() !== '') {
-      const newValue = {
-        inputValue,
-        itemName: '',
-        aisleNumber: '',
-        loading: true
-      };
-  
-      setStoredValues(prevValues => [...prevValues, newValue]);
-      setInputValue('');
-  
-      // Start the background process to fetch data
-      fetchData(newValue, storedValues.length);
-    }
-  };
 
   const fetchData = async (value, index) => {
     try {
@@ -79,30 +97,29 @@ function AddItems() {
 
   return (
     <div className="AddItems">
-      <div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-        <button onClick={handleSubmit} disabled={loading}>Submit</button>
-      </div>
+        <div>
+            <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+            />
+            <button onClick={handleSubmit} disabled={loading}>Submit</button>
+        </div>
 
-      <h3>Stored Values:</h3>
-      <ul>
-        {storedValues.map((value, index) => (
-          <li key={index}>
-            Item: {value.itemName}, Aisle: {value.aisleNumber}
-          </li>
-        ))}
-      </ul>
-      <NavLink to="/map"><button>
-              Go to the Map page
+        <h3>Stored Values:</h3>
+        <ul>
+            {storedValues.map((value, index) => (
+                <li key={index}>
+                    Item: {value.itemName}, Aisle: {value.aisleNumber}
+                </li>
+            ))}
+        </ul>
+        <NavLink to="/map"><button>
+                Go to the Map page
             </button>
-            </NavLink>
+        </NavLink>
     </div>
-    
-  );
+);
 }
 
 export default AddItems;
