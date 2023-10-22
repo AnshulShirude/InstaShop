@@ -78,12 +78,12 @@ export default function MasterGraph(props) {
 
   // initilaze the translation Map
   graph.itemTranslation.set("A6", graph.board[55][6]);
-  graph.itemTranslation.set("A5", graph.board[58][4]);
+  graph.itemTranslation.set("A5", graph.board[69][16]);
   graph.itemTranslation.set("A4", graph.board[58][2]);
   graph.itemTranslation.set("A3", graph.board[61][6]);
   graph.itemTranslation.set("A2", graph.board[62][5]);
 
-  graph.itemTranslation.set("B16", graph.board[21][7]);
+  graph.itemTranslation.set("B16", graph.board[8][14]);
   graph.itemTranslation.set("B15", graph.board[25][4]);
   graph.itemTranslation.set("B14", graph.board[25][2]);
   graph.itemTranslation.set("B13", graph.board[29][6]);
@@ -92,8 +92,8 @@ export default function MasterGraph(props) {
   graph.itemTranslation.set("B10", graph.board[33][6]);
   graph.itemTranslation.set("B9", graph.board[36][7]);
   graph.itemTranslation.set("B8", graph.board[36][3]);
-  graph.itemTranslation.set("B7", graph.board[39][3]);
-  graph.itemTranslation.set("B6", graph.board[40][4]);
+  graph.itemTranslation.set("B7", graph.board[36][17]);
+  graph.itemTranslation.set("B6", graph.board[8][14]);
   graph.itemTranslation.set("B5", graph.board[43][5]);
   graph.itemTranslation.set("B4", graph.board[44][6]);
   graph.itemTranslation.set("B3", graph.board[47][7]);
@@ -119,10 +119,10 @@ export default function MasterGraph(props) {
   graph.itemTranslation.set("D27", graph.board[29][18]);
   graph.itemTranslation.set("D26", graph.board[29][13]);
   graph.itemTranslation.set("D25", graph.board[33][16]);
-  graph.itemTranslation.set("D24", graph.board[36][17]);
-  graph.itemTranslation.set("D23", graph.board[37][14]);
+  graph.itemTranslation.set("D24", graph.board[36][4]);
+  graph.itemTranslation.set("D23", graph.board[25][4]);
   graph.itemTranslation.set("D22", graph.board[40][16]);
-  graph.itemTranslation.set("D21", graph.board[41][14]);
+  graph.itemTranslation.set("D21", graph.board[41][18]);
   graph.itemTranslation.set("D20", graph.board[44][15]);
   graph.itemTranslation.set("D19", graph.board[45][14]);
   graph.itemTranslation.set("D18", graph.board[48][16]);
@@ -136,8 +136,9 @@ export default function MasterGraph(props) {
   graph.itemTranslation.set("D10", graph.board[65][18]);
   graph.itemTranslation.set("D9", graph.board[65][17]);
   graph.itemTranslation.set("D8", graph.board[69][14]);
-  graph.itemTranslation.set("D7", graph.board[69][16]);
+  graph.itemTranslation.set("D7", graph.board[69][17]);
   graph.itemTranslation.set("D6", graph.board[73][15]);
+  graph.itemTranslation.set("D4", graph.board[25][19]);
 
   //////////////////////////////////////////////////////////////
 
@@ -196,11 +197,16 @@ export default function MasterGraph(props) {
       if (pathColor === "green") {
         pathColor = nodesToCover.includes(currNode) ? "red" : "green";
       }
+      if (currNode === startNode) {
+        pathColor = "black"
+      }
+      if (currNode === endNode) {
+        pathColor = "black"
+      }
 
       const cellStyle = {
-        width: "18px",
+        width: "16px",
         height: "30px",
-        // backgroundColor: `${currNode.withinBorder ? "grey" : "white"}`,
         backgroundColor: pathColor,
         borderLeft: `1px solid ${leftBorderColor}`,
         borderRight: `1px solid ${rightBorderColor}`,
@@ -210,20 +216,17 @@ export default function MasterGraph(props) {
 
       row.push(
         <div key={`${i}-${j}`} className="cell" style={cellStyle}>
-          {/* {i} */}
-          {/* {!currNode.withinBorder && (istInTranslation ? "x" : "o")} */}
         </div>
       );
     }
     graphData.push(row);
   }
 
-  // assuming that the graph is populated with Nodes (x/y coordinates)
 
   return (
     <div className="graph-container">
       {graphData.map((row, rowIndex) => (
-        <div key={rowIndex} className="row" style={{ display: "flex" }}>
+        <div key={rowIndex} className="row" style={{ display: "flex", justifyContent:"center"}}>
           {row}
         </div>
       ))}

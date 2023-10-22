@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useContext } from "react";
 import { NodesContext } from "../App";
-// import './AddItems.css';
 import { NavLink } from "react-router-dom";
 
 function AddItems() {
@@ -11,27 +10,28 @@ function AddItems() {
   const [aisleLoading, setAisleLoading] = useState(false);
   const [foodAisleMap, setFoodAisleMap] = useState({});
   const { setNodes } = useContext(NodesContext);
+  // Oopsie lol
   const key = "0CC42161E0A649A2AC3625E7CE64A56E";
 
   // Predefined local map of 20 food items and their aisle numbers
   const LOCAL_FOOD_AISLE_MAP = {
     beef: "C9",
     chicken: "C9",
-    goldfish: "C10",
-    "fruit snack": "C10",
-    ham: "C8",
+    goldfish: "D23", // USING
+    "fruit snacks": "C10",
+    ham: "D24", 
     cheese: "C5",
     bagel: "C1",
-    eyeliner: "B13",
+    deodorant: "B16", // USING
     toilet: "D26",
     detergent: "D22",
-    broom: "D21",
+    broom: "D7", // USING
     toothpaste: "B6",
-    deodarant: "B5",
-    football: "D6",
-    headphone: "A6",
-    charger: "A5",
-    shoes: "D4",
+    eyeliner: "B5",
+    football: "D21",
+    headphones: "A6",
+    charger: "A5", // USING
+    banana: "D4" 
   };
 
   const handleInputChange = (event) => {
@@ -125,32 +125,48 @@ function AddItems() {
     console.log("We created aisleNumbers: ", aisleNumbers);
     setNodes(aisleNumbers);
   };
-  return (
-    <div className="AddItems">
-      <div>
-        <input type="text" value={inputValue} onChange={handleInputChange} />
-        <button onClick={handleSubmit}>Submit</button>
-        {/*  disabled={aisleLoading} */}
-      </div>
 
-      <h3>Stored Values:</h3>
-      <ul>
-        {storedValues.map((value, index) => (
-          <li key={index}>
-            Item: {value.itemName} {value.loading ? "(loading...)" : ""}, Aisle:{" "}
-            {value.aisleNumber}
-          </li>
-        ))}
-      </ul>
+  const containerStyles = {
+    display: "flex",
+    padding: "20px",
+  };
+  return (
+    <>
+      <h1>Add Items!</h1>
+      <div
+        style={{
+          display: "flex",
+          paddingLeft: "20px",
+          justifyContent: "space-around",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <span>Input Your Items to add to your Shopping List!</span>
+          <input type="text" value={inputValue} onChange={handleInputChange} />
+          <button onClick={handleSubmit}>Submit</button>
+        </div>
+        <div>
+          <span>Created ShoppingList</span>
+          <ul>
+            {storedValues.map((value, index) => (
+              <li key={index}>
+                Item: {value.itemName} {value.loading ? "(loading...)" : ""},
+                Aisle: {value.aisleNumber}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       <NavLink
         to={{
           pathname: "/map",
           state: { aisleNumbers: storedValues.map((val) => val.aisleNumber) },
         }}
+        style={{ marginTop: "10px" }}
       >
         <button onClick={() => createUpdatedLinks()}>Go to the Map page</button>
       </NavLink>
-    </div>
+    </>
   );
 }
 
