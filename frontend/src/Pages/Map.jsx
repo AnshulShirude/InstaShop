@@ -8,14 +8,6 @@ function MapPage() {
   return (
     <div>
       <h1>Map Page</h1>
-      <div>
-        <h2>Aisle Numbers:</h2>
-        <ul>
-          {/* {aisleNumbers.map((aisleNumber, index) => (
-            <li key={index}>{aisleNumber}</li>
-          ))} */}
-        </ul>
-      </div>
       <MasterGraph />
     </div>
   );

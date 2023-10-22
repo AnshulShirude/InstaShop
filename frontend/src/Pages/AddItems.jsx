@@ -17,21 +17,21 @@ function AddItems() {
   const LOCAL_FOOD_AISLE_MAP = {
     beef: "C9",
     chicken: "C9",
-    goldfish: "C10",
-    "fruit snack": "C10",
-    ham: "C8",
+    goldfish: "D23", // USING
+    "fruit snacks": "C10",
+    ham: "D24", 
     cheese: "C5",
     bagel: "C1",
-    eyeliner: "B13",
+    deodorant: "B16", // USING
     toilet: "D26",
     detergent: "D22",
-    broom: "D21",
+    broom: "D7", // USING
     toothpaste: "B6",
-    deodarant: "B5",
-    football: "D6",
-    headphone: "A6",
-    charger: "A5",
-    shoes: "D4",
+    eyeliner: "B5",
+    football: "D21",
+    headphones: "A6",
+    charger: "A5", // USING
+    banana: "D4" 
   };
 
   const handleInputChange = (event) => {
