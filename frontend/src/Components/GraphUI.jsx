@@ -1,4 +1,4 @@
-import {Graph, Node, Edge, linkNodes, createBoard} from "../GraphLogic/graph"
+import {Graph, createBoard, linkNodes} from "../GraphLogic/graph"
 
 export default function GraphUI() {
 
@@ -11,6 +11,11 @@ export default function GraphUI() {
 
     const graph = new Graph(board, edges);
     const graphData = [];
+
+    graph.createAisles(graph.board[2][2], graph.board[2][5]);
+    graph.createAisles(graph.board[4][2], graph.board[4][5]);
+    graph.createAisles(graph.board[6][2], graph.board[6][5]);
+
 
     for (let j = 0; j < graph.board[0].length; j++) {
 
