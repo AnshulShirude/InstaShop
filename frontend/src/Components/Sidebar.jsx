@@ -12,8 +12,8 @@ const Sidebar = ({ children }) => {
     const menuItem = [
         { name: 'HomePage', path: '/', icon:  <BsFillHouseDoorFill/>},
         { name: 'AddItems', path: '/add-items' , icon: <BsPlus />},
-        { name: 'AboutUs', path: '/about-us', icon : <BsInfoCircle />},
-        { name: 'MapPage', path: '/map', icon : <BsMap />}
+        { name: 'MapPage', path: '/map', icon : <BsMap />},
+        { name: 'AboutUs', path: '/about-us', icon : <BsInfoCircle />}
     ]
     return (
         <div className="sidebar_container">

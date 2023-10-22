@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 // import './AddItems.css';
+import { NavLink } from 'react-router-dom';
 
 function AddItems() {
     const [inputValue, setInputValue] = useState('');
@@ -95,7 +96,12 @@ function AddItems() {
           </li>
         ))}
       </ul>
+      <NavLink to="/map"><button>
+              Go to the Map page
+            </button>
+            </NavLink>
     </div>
+    
   );
 }
 
