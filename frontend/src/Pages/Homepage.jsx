@@ -2,15 +2,15 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 // import '../styles.css'
 // import '.././styles.css';
-
+import '../styles.css';
 
 function Homepage() {
     return (
-        <div className="bg-gray-900 text-white h-screen flex flex-col justify-center items-center">
-            <h1 className="text-4xl font-extrabold mb-4">Welcome!</h1>
-            <p className="text-lg mb-8">Welcome to the Application!</p>
+        <div className="bg-black text-white h-screen flex flex-col justify-center items-center">
+            <h1 className="text-5xl font-mono mb-4 border-b border-white">Welcome!</h1>
+            <p className="text-lg mb-8 font-mono">Welcome to the Application!</p>
             <NavLink to="/add-items">
-                <button className="bg-red-600 text-white py-2 px-6 rounded-full hover:bg-red-700">
+                <button className="bg-white text-black py-2 px-6 rounded hover:bg-gray-500 hover:text-white border border-white">
                     Go to Add Items Page
                 </button>
             </NavLink>
