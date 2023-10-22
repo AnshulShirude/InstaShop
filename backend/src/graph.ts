@@ -9,6 +9,10 @@ class Node {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+    this.north = undefined;
+    this.east = undefined;
+    this.south = undefined;
+    this.west = undefined;
   }
 
   print() {

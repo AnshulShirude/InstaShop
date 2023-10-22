@@ -2,6 +2,10 @@ class Node {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.north = undefined;
+        this.east = undefined;
+        this.south = undefined;
+        this.west = undefined;
     }
     print() {
         return "X Coordinate:" + this.x + " Y Coordinate: " + this.y;
@@ -167,7 +171,21 @@ function linkNodes(board) {
     }
     return edges;
 }
-
+function drawGraph(graph) {
+    const mazeContainer = document.getElementById("maze-container");
+    for (let i = 0; i < graph.board.length; i++) {
+        const mazeRow = document.createElement("div");
+        for (let j = 0; j < graph.board[i].length; j++) {
+            const mazeBox = document.createElement("div");
+            mazeBox.style.width = "20px";
+            mazeBox.style.height = "20px";
+            mazeBox.style.border = "1px solid black";
+            mazeBox.style.backgroundColor = "white";
+            mazeRow.appendChild(mazeBox);
+        }
+        mazeContainer.appendChild(mazeRow);
+    }
+}
 function main() {
     // width, height
     const board = createBoard(5, 5);
@@ -186,5 +204,5 @@ function main() {
     }
 }
 main();
-export { Graph, Node, Edge, createBoard, linkNodes };
+export { Graph, createBoard, linkNodes, Node };
 //# sourceMappingURL=graph.js.map
