@@ -1,102 +1,143 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 // import './AddItems.css';
+import { NavLink } from 'react-router-dom';
 
 function AddItems() {
     const [inputValue, setInputValue] = useState('');
-  const [storedValues, setStoredValues] = useState([]);
-  const [loading, setLoading] = useState(false);
-  
+    const [storedValues, setStoredValues] = useState([]);
+    const [aisleLoading, setAisleLoading] = useState(false);
+    const [foodAisleMap, setFoodAisleMap] = useState({});
+    const key = '0CC42161E0A649A2AC3625E7CE64A56E';
 
-  const handleInputChange = event => {
-    setInputValue(event.target.value);
-  };
+    // Predefined local map of 20 food items and their aisle numbers
+    const LOCAL_FOOD_AISLE_MAP = {
+        'beef': 'C9',
+        'chicken': 'C9',
+        'goldfish': 'C10',
+        'fruit snack': 'C10',
+        'ham': 'C8',
+        'cheese': 'C5',
+        'bagel': 'C1',
+        'eyeliner': 'B13',
+        'toilet': 'D26',
+        'detergent': 'D22',
+        'broom': 'D21',
+        'toothpaste': 'B6',
+        'deodarant': 'B5',
+        'football': 'D6',
+        'headphone': 'A6',
+        'charger': 'A5',
+        'shoes': 'D4'
+    };
 
-  const handleSubmit = () => {
-    if (inputValue.trim() !== '') {
-      const newValue = {
-        inputValue,
-        itemName: '',
-        aisleNumber: '',
-        loading: true
-      };
-  
-      setStoredValues(prevValues => [...prevValues, newValue]);
-      setInputValue('');
-  
-      // Start the background process to fetch data
-      fetchData(newValue, storedValues.length);
-    }
-  };
+    const handleInputChange = event => {
+        setInputValue(event.target.value);
+    };
 
-  const fetchData = async (value, index) => {
-    try {
-      const response = await axios.get('https://api.redcircleapi.com/request', {
-        params: {
-          api_key: '2781954E0602468C825B52F94D1CD1CC',
-          search_term: inputValue,
-          type: 'search',
-          customer_zipcode: '02215',
-          delivery_type: 'in_store_pickup',
-          sort_by: 'best_match',
-          output: 'json'
-        }
-      });
-  
-      const product_tcin = response.data.search_results[0].product.tcin;
-      const product_title = response.data.search_results[0].product.title;
-      console.log(product_title);
-  
-      const aisleResponse = await axios.get('https://api.redcircleapi.com/request', {
-        params: {
-          api_key: '2781954E0602468C825B52F94D1CD1CC',
-          type: 'product',
-          tcin: product_tcin,
-          customer_zipcode: '02215',
-          output: 'json'
-        }
-      });
-  
-      const itemName = aisleResponse.data.product.title;
-      const aisleNumber = aisleResponse.data.product.aisle;
-  
-      // Update the specific stored value with the fetched data and set loading to false
-      setStoredValues(prevValues => {
-        const updatedValues = [...prevValues];
-        updatedValues[index] = {
-          ...updatedValues[index],
-          itemName,
-          aisleNumber,
-          loading: false
+    const handleSubmit = () => {
+      const lowerCaseInputValue = inputValue.trim().toLowerCase(); 
+
+      // First check if the food item exists in the local predefined map
+      if (LOCAL_FOOD_AISLE_MAP[lowerCaseInputValue]) {
+          setStoredValues(prevValues => [...prevValues, {
+              inputValue: lowerCaseInputValue,
+              itemName: lowerCaseInputValue,
+              aisleNumber: LOCAL_FOOD_AISLE_MAP[lowerCaseInputValue],
+              loading: false
+          }]);
+          setInputValue('');
+      } 
+      // If not in the local map, check in the existing state or fetch from API
+      else {
+        const newValue = {
+            inputValue: lowerCaseInputValue,
+            itemName: lowerCaseInputValue,
+            aisleNumber: '',
+            loading: true
         };
-        return updatedValues;
-      });
-    } catch (error) {
-      console.error('Error fetching data:', error);
+
+        setStoredValues(prevValues => [...prevValues, newValue]);
+        setInputValue('');
+
+        fetchData(newValue, storedValues.length);
     }
-  };
+};
 
-  return (
-    <div className="AddItems">
-      <div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-        <button onClick={handleSubmit} disabled={loading}>Submit</button>
-      </div>
+const fetchData = async (value, index) => {
+  try {
+      setAisleLoading(true);
 
-      <h3>Stored Values:</h3>
-      <ul>
-        {storedValues.map((value, index) => (
-          <li key={index}>
-            Item: {value.itemName}, Aisle: {value.aisleNumber}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+      const response = await axios.get('https://api.redcircleapi.com/request', {
+          params: {
+              api_key: key,
+              search_term: value.inputValue,
+              type: 'search',
+              customer_zipcode: '02215-1205',
+              delivery_type: 'in_store_pickup',
+              output: 'json'
+          }
+      });
+
+      const product_tcin = response.data.search_results[0].product.tcin;
+
+      const aisleResponse = await axios.get('https://api.redcircleapi.com/request', {
+          params: {
+              api_key: key,
+              type: 'product',
+              tcin: product_tcin,
+              customer_zipcode: '02215-1205',
+              output: 'json'
+          }
+      });
+
+      const aisleNumber = aisleResponse.data.product.aisle;
+      setFoodAisleMap(prevMap => ({ ...prevMap, [value.inputValue]: aisleNumber }));
+
+      setStoredValues(prevValues => {
+          const updatedValues = [...prevValues];
+          updatedValues[index].aisleNumber = aisleNumber;
+          updatedValues[index].loading = false;
+          return updatedValues;
+      });
+
+      setAisleLoading(false);
+
+  } catch (error) {
+      console.error('Error fetching data:', error);
+  }
+  
+};
+    return (
+        <div className="AddItems">
+            <div>
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                />
+                <button onClick={handleSubmit}>Submit</button>
+                {/*  disabled={aisleLoading} */}
+            </div>
+
+            <h3>Stored Values:</h3>
+            <ul>
+                {storedValues.map((value, index) => (
+                    <li key={index}>
+                        Item: {value.itemName} {value.loading ? "(loading...)" : ""}, Aisle: {value.aisleNumber}
+                    </li>
+                ))}
+            </ul>
+            <NavLink 
+                to={{
+                    pathname: "/map",
+                    state: { aisleNumbers: storedValues.map(val => val.aisleNumber) }
+                }}
+            >
+                <button>Go to the Map page</button>
+            </NavLink>
+        </div>
+    );
 }
 
 export default AddItems;
