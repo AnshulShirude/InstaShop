@@ -12,18 +12,19 @@ export default function GraphUI() {
     const graph = new Graph(board, edges);
     const graphData = [];
 
-    // graph.board[0][0].east = null;
-    // graph.board[0][1].west = null;
+    graph.board[0][0].east = null;
+    graph.board[0][1].west = null;
 
     const cellStyle = {
         width: '80px', 
         height: '80px', 
+        
     };
 
-    for (let i = 0; i < graph.board.length; i++) {
-        const row = [];
+    for (let j = 0; j < graph.board[0].length; j++) {
 
-        for (let j = 0; j < graph.board[i].length; j++) {
+        const row = [];
+        for (let i = 0; i < graph.board.length; i++) {
 
             const currNode = graph.board[i][j];
             const leftBorder = currNode.west ? "none" : "solid";
