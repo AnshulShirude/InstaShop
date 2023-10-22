@@ -121,33 +121,43 @@ class Graph {
         // Removing the horizontal edges needed
 
         if (i === leftX) {
-          //unhook the upperNode
-          const prevLeftNode = this.board[i - 1][j];
-          prevLeftNode.east = null;
+          console.log("in this case1");
+          if (i >= 1) {
+            const prevLeftNode = this.board[i - 1][j];
+            prevLeftNode.east = null;
 
-          currentNode.west = null;
+            currentNode.west = null;
+          }
         }
 
         if (i === rightX) {
-          //unhook the upperNode
-          const forwardRightNode = this.board[i + 1][j];
-          forwardRightNode.west = null;
+          console.log("in this case2");
+          if (i < this.board.length - 2) {
+            const forwardRightNode = this.board[i + 1][j];
+            forwardRightNode.west = null;
 
-          currentNode.east = null;
+            currentNode.east = null;
+          }
         }
 
         if (j === southY) {
-          const prevBelowNode = this.board[i][j + 1];
-          prevBelowNode.north = null;
+          console.log("in this case3");
+          if (j < this.board[0].length - 2) {
+            const prevBelowNode = this.board[i][j + 1];
+            prevBelowNode.north = null;
 
-          currentNode.south = null;
+            currentNode.south = null;
+          }
         }
 
         if (j === northY) {
-          const forwardBelowNode = this.board[i][j - 1];
-          forwardBelowNode.south = null;
+          console.log("in this case4");
+          if (j >= 1) {
+            const forwardBelowNode = this.board[i][j - 1];
+            forwardBelowNode.south = null;
 
-          currentNode.north = null;
+            currentNode.north = null;
+          }
         }
       }
     }
@@ -352,18 +362,18 @@ function main() {
 
   console.log("FIRST GO!");
   const graph = new Graph(board, edges);
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      console.log(board[i][j].print());
+  for (let i = 0; i < graph.board.length; i++) {
+    for (let j = 0; j < graph.board[0].length; j++) {
+      console.log(graph.board[i][j].print());
     }
   }
 
-  graph.createAisles(board[1][1], board[1][2]);
+  graph.createAisles(graph.board[0][0], graph.board[2][2]);
 
   console.log("SECOND GO!");
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      console.log(board[i][j].print());
+  for (let i = 0; i < graph.board.length; i++) {
+    for (let j = 0; j < graph.board[0].length; j++) {
+      console.log(graph.board[i][j].print());
     }
   }
 
