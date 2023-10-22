@@ -2,7 +2,7 @@ import {Graph, Node, Edge, linkNodes, createBoard} from "../GraphLogic/graph"
 
 export default function GraphUI() {
 
-    const board = createBoard(5, 6);
+    const board = createBoard(20, 20);
     console.log(board);
     const edges = linkNodes(board);
     for (const edge of edges) {
@@ -16,9 +16,8 @@ export default function GraphUI() {
     graph.board[0][1].west = null;
 
     const cellStyle = {
-        width: '80px', 
-        height: '80px', 
-        
+        width: '40px', 
+        height: '40px',         
     };
 
     for (let j = 0; j < graph.board[0].length; j++) {
@@ -27,21 +26,21 @@ export default function GraphUI() {
         for (let i = 0; i < graph.board.length; i++) {
 
             const currNode = graph.board[i][j];
-            const leftBorder = currNode.west ? "none" : "solid";
-            const topBorder = currNode.north ? "none" : "solid";
-            const bottomBorder = currNode.south ? "none" : "solid";
-            const rightBorder = currNode.east ? "none" : "solid";
+            const leftBorderColor = currNode.west ? "white" : "black";
+            const topBorderColor = currNode.north ? "white" : "black";
+            const bottomBorderColor = currNode.south ? "white" : "black";
+            const rightBorderColor = currNode.east ? "white" : "black";
 
             const borders = {
-                borderLeft: leftBorder,
-                borderTop: topBorder,
-                borderBottom: bottomBorder,
-                borderRight: rightBorder,
+                borderLeft: `1px solid ${leftBorderColor}`,
+                borderRight: `1px solid ${rightBorderColor}`,
+                borderTop: `1px solid ${topBorderColor}`,
+                borderBottom: `1px solid ${bottomBorderColor}`,
             };
 
             row.push(
                 <div key={`${i}-${j}`} className="cell" style={{...cellStyle, ...borders}}>
-                    Cell ({i}, {j})
+                    o
                 </div>
             );
         }
