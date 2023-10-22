@@ -50,7 +50,6 @@ class Node {
 class Edge {
   NodeTo: Node;
   NodeFrom: Node;
-  // distance:
 
   constructor(NodeTo: Node, NodeFrom: Node) {
     this.NodeTo = NodeTo;
@@ -80,9 +79,7 @@ class Edge {
 
 class Graph {
   board: Node[][];
-  // list of edges
   edges: Edge[];
-  // Translate a Aisle Name to A Node in a Graph
   itemTranslation: Map<string, Node>;
   visited: boolean[][];
   pathFound: boolean;
@@ -118,36 +115,40 @@ class Graph {
         const currentNode = this.board[i][j];
         currentNode.withinBorder = true;
 
-        // Removing the horizontal edges needed
-
         if (i === leftX) {
-          //unhook the upperNode
-          const prevLeftNode = this.board[i - 1][j];
-          prevLeftNode.east = null;
+          if (i >= 1) {
+            const prevLeftNode = this.board[i - 1][j];
+            prevLeftNode.east = null;
 
-          currentNode.west = null;
+            currentNode.west = null;
+          }
         }
 
         if (i === rightX) {
-          //unhook the upperNode
-          const forwardRightNode = this.board[i + 1][j];
-          forwardRightNode.west = null;
+          if (i < this.board.length - 2) {
+            const forwardRightNode = this.board[i + 1][j];
+            forwardRightNode.west = null;
 
-          currentNode.east = null;
+            currentNode.east = null;
+          }
         }
 
         if (j === southY) {
-          const prevBelowNode = this.board[i][j + 1];
-          prevBelowNode.north = null;
+          if (j < this.board[0].length - 2) {
+            const prevBelowNode = this.board[i][j + 1];
+            prevBelowNode.north = null;
 
-          currentNode.south = null;
+            currentNode.south = null;
+          }
         }
 
         if (j === northY) {
-          const forwardBelowNode = this.board[i][j - 1];
-          forwardBelowNode.south = null;
+          if (j >= 1) {
+            const forwardBelowNode = this.board[i][j - 1];
+            forwardBelowNode.south = null;
 
-          currentNode.north = null;
+            currentNode.north = null;
+          }
         }
       }
     }
@@ -272,7 +273,6 @@ class Graph {
 }
 
 // eventually add in functionality to add in an item for an aisl
-
 function createBoard(width: number, height: number) {
   let board = [];
   //create the 2D Grid
@@ -322,26 +322,7 @@ function linkNodes(board: Node[][]) {
   return edges;
 }
 
-function drawGraph(graph: Graph): void {
-  const mazeContainer = document.getElementById("maze-container");
-
-  for (let i = 0; i < graph.board.length; i++) {
-    const mazeRow = document.createElement("div");
-
-    for (let j = 0; j < graph.board[i].length; j++) {
-      const mazeBox = document.createElement("div");
-      mazeBox.style.width = "20px";
-      mazeBox.style.height = "20px";
-      mazeBox.style.border = "1px solid black";
-      mazeBox.style.backgroundColor = "white";
-      mazeRow.appendChild(mazeBox);
-    }
-
-    mazeContainer.appendChild(mazeRow);
-  }
-}
-
-function main() {
+function test() {
   // width, height
   const board = createBoard(4, 4);
   const edges = linkNodes(board);
@@ -352,18 +333,18 @@ function main() {
 
   console.log("FIRST GO!");
   const graph = new Graph(board, edges);
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      console.log(board[i][j].print());
+  for (let i = 0; i < graph.board.length; i++) {
+    for (let j = 0; j < graph.board[0].length; j++) {
+      console.log(graph.board[i][j].print());
     }
   }
 
-  graph.createAisles(board[1][1], board[1][2]);
+  graph.createAisles(graph.board[0][0], graph.board[2][2]);
 
   console.log("SECOND GO!");
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      console.log(board[i][j].print());
+  for (let i = 0; i < graph.board.length; i++) {
+    for (let j = 0; j < graph.board[0].length; j++) {
+      console.log(graph.board[i][j].print());
     }
   }
 
@@ -380,17 +361,8 @@ function main() {
   const [distance, path] = graph.shortestPath(matrix, nodesToCover);
   console.log("Distance", distance);
   console.log("Path", path);
-
-  // console.log("Result: ", result);
-
-  // console.log(edges.length);
-  // for (const edge of edges) {
-  //   const NodeFromPrint = edge.NodeFrom.print();
-  //   const NodeToPrint = edge.NodeTo.print();
-  //   console.log(NodeFromPrint, "-", NodeToPrint);
-  // }
 }
 
-main();
+// test();
 
 export { Graph, Node, Edge, createBoard, linkNodes };

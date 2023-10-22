@@ -15,6 +15,8 @@ export default function GraphUI() {
     graph.createAisles(graph.board[2][2], graph.board[2][5]);
     graph.createAisles(graph.board[4][2], graph.board[4][5]);
     graph.createAisles(graph.board[6][2], graph.board[6][5]);
+    graph.createAisles(graph.board[9][4], graph.board[9][7]);
+    console.log('This is the graph: ', graph);
 
 
     for (let j = 0; j < graph.board[0].length; j++) {
@@ -23,14 +25,15 @@ export default function GraphUI() {
         for (let i = 0; i < graph.board.length; i++) {
 
             const currNode = graph.board[i][j];
-            const leftBorderColor = currNode.west ? "white" : "black";
-            const topBorderColor = currNode.north ? "white" : "black";
-            const bottomBorderColor = currNode.south ? "white" : "black";
-            const rightBorderColor = currNode.east ? "white" : "black";
+            const leftBorderColor = !currNode.withinBorder && currNode.west ? "white" : "black";
+            const topBorderColor = !currNode.withinBorder && currNode.north ? "white" : "black";
+            const bottomBorderColor = !currNode.withinBorder && currNode.south ? "white" : "black";
+            const rightBorderColor = !currNode.withinBorder && currNode.east ? "white" : "black";
 
             const cellStyle = {
                 width: '40px', 
                 height: '40px', 
+                backgroundColor: `${currNode.withinBorder ? "black" : "white"}`,
                 borderLeft: `1px solid ${leftBorderColor}`,
                 borderRight: `1px solid ${rightBorderColor}`,
                 borderTop: `1px solid ${topBorderColor}`,
