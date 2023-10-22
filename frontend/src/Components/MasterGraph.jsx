@@ -1,6 +1,10 @@
 import { Graph, createBoard, linkNodes } from "../GraphLogic/graph";
 
-export default function MasterGraph() {
+
+export default function MasterGraph(props) {
+
+  const { aisleNumbers } = props; 
+
   const board = createBoard(80, 20);
   console.log(board);
   const edges = linkNodes(board);
@@ -134,32 +138,34 @@ export default function MasterGraph() {
   graph.itemTranslation.set("D7", graph.board[69][16]);
   graph.itemTranslation.set("D6", graph.board[73][15]);
 
-  //////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////////////////////
+  
   const startNode = graph.getNode(79, 9);
   const endNode = graph.getNode(73, 2);
 
-  // const nodesToCover = Array.from(graph.itemTranslation.values());
-  const nodesToCover = [
-    graph.getNode(25, 4),
-    graph.getNode(8, 14),
-    graph.getNode(36, 17),
-    graph.getNode(69, 16),
-  ];
+  const nodesToCover = []
+  for (const aisle of aisleNumbers) {
+    const node = graph.itemTranslation.get(aisle);
+    nodesToCover.push(node);
+  }
 
+  
+  // const nodesToCover = [graph.getNode(25, 4), graph.getNode(8, 14), graph.getNode(36 ,17), graph.getNode(69, 16)];
+  
   const path = graph.shortestPathBFS(startNode, endNode, nodesToCover);
   console.log(`Shortest path length: ${path.length}`);
   const pathCoords = [];
   for (let node of path) {
-    pathCoords.push([node.x, node.y]);
+    pathCoords.push([node.x, node.y])
   }
-  console.log("Path:", pathCoords);
+  console.log('Path:', pathCoords);
 
   const finalPath = new Set();
   for (let item of path) {
     finalPath.add(graph.getNode(item.x, item.y));
   }
-  console.log("This is the final path: ", finalPath);
+  console.log('This is the final path: ', finalPath);
   //////////////////////////////////////////////////////////////
 
   for (let j = 0; j < graph.board[0].length; j++) {
@@ -186,16 +192,15 @@ export default function MasterGraph() {
 
       let pathColor = currNode.withinBorder ? "grey" : "white";
       if (pathColor === "white") {
-        pathColor = finalPath.has(currNode) ? "green" : "white";
+        pathColor = finalPath.has(currNode) ? "green" : "white"
       }
-
       if (pathColor === "green") {
-        pathColor = nodesToCover.includes(currNode) ? "red" : "green";
+        pathColor = nodesToCover.includes(currNode) ? "red" : "green"
       }
 
       const cellStyle = {
-        width: "12px",
-        height: "26px",
+        width: "18px",
+        height: "30px",
         // backgroundColor: `${currNode.withinBorder ? "grey" : "white"}`,
         backgroundColor: pathColor,
         borderLeft: `1px solid ${leftBorderColor}`,
@@ -206,7 +211,7 @@ export default function MasterGraph() {
 
       row.push(
         <div key={`${i}-${j}`} className="cell" style={cellStyle}>
-          {/* {i} */}
+        {/* {i} */}
           {/* {!currNode.withinBorder && (istInTranslation ? "x" : "o")} */}
         </div>
       );
