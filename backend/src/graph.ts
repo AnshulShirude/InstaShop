@@ -1,20 +1,25 @@
 class Node {
   x: number;
   y: number;
-  withinBorder: Boolean;
-  north: Node;
-  south: Node;
-  east: Node;
-  west: Node;
+  north = undefined;
+  south = undefined;
+  east = undefined;
+  west = undefined;
+  withinBorder = false;
+  visited = false;
 
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.north = undefined;
-    this.east = undefined;
-    this.west = undefined;
-    this.south = undefined;
-    this.withinBorder = false;
+  }
+
+
+  equals(node: Node) {
+    return this.x === node.x && this.y === node.y;
+  }
+
+  resetVisited() {
+    this.visited = false;
   }
 
   print() {
@@ -77,25 +82,50 @@ class Edge {
   }
 }
 
+
 class Graph {
   board: Node[][];
   edges: Edge[];
   itemTranslation: Map<string, Node>;
-  visited: boolean[][];
   pathFound: boolean;
 
   constructor(board: Node[][], edges: Edge[]) {
     this.board = board;
     this.edges = edges;
-    this.visited = new Array(board.length);
     this.itemTranslation = new Map();
+  }
 
-    for (let i = 0; i < board.length; i++) {
-      this.visited[i] = new Array(board[0].length);
-      for (let j = 0; j < board[0].length; j++) {
-        this.visited[i][j] = false;
+  public getNode(x: number, y: number): Node {
+    return this.board[x][y];
+  }
+
+  private getNeighbors(node: Node): Node[] {
+
+    const moves = []
+    if (node.west) {
+      moves.push([-1, 0]);
+    }
+    if (node.east) {
+      moves.push([1, 0]);
+    }
+    if (node.north) {
+      moves.push([0, -1]);
+    }
+    if (node.south) {
+      moves.push([0, 1]);
+    }
+    const neighbors: Node[] = [];
+
+    for (const [dx, dy] of moves) {
+      const nx = node.x + dx;
+      const ny = node.y + dy;
+
+      if (nx >= 0 && nx < this.board.length && ny >= 0 && ny < this.board[0].length) {
+        neighbors.push(this.board[nx][ny]);
       }
     }
+
+    return neighbors;
   }
 
   // adds an item on our Map to represent a Node
@@ -154,128 +184,72 @@ class Graph {
     }
   }
 
-  // List of Nodes Return Type
-  dfs(
-    currentPosX: number,
-    currentPosY: number,
-    endingPosX: number,
-    endingPosY: number,
-    path: Node[]
-  ) {
-    if (currentPosX === endingPosX && currentPosY === endingPosY) {
-      this.pathFound = true;
-      return path;
-    }
+  public bfs(start: Node, end: Node): Node[] {
+    const queue: [Node, Node[]][] = [[start, [start]]];
+    start.visited = true;
 
-    if (
-      currentPosX < 0 ||
-      currentPosX >= this.board.length ||
-      currentPosY < 0 ||
-      currentPosY >= this.board[0].length ||
-      this.visited[currentPosX][currentPosY]
-    ) {
-      return;
-    }
+    while (queue.length > 0) {
+      const [current, path] = queue.shift()!;
+      if (current.equals(end)) {
+        this.resetAllVisited();
+        return path;
+      }
 
-    this.visited[currentPosX][currentPosY] = true;
-
-    const currentNode = this.board[currentPosX][currentPosY];
-    // here we add the logic for if we can go left, right, up, or bottom
-    const outNeighbors = currentNode.getNeighbors();
-    for (const node of outNeighbors) {
-      const newPath = [...path];
-      newPath.push(node);
-
-      // Recursive call with the new path
-      const result = this.dfs(node.x, node.y, endingPosX, endingPosY, newPath);
-
-      if (result) {
-        // If the path is found in the recursive call, return it
-        return result;
+      for (const neighbor of this.getNeighbors(current)) {
+        if (!neighbor.visited && !neighbor.withinBorder) {
+          neighbor.visited = true;
+          queue.push([neighbor, [...path, neighbor]]);
+        }
       }
     }
+
+    this.resetAllVisited();
+    return [];
   }
 
-  shortestPath(matrix: number[][], nodesToCover: [number, number][]) {
-    const m = matrix.length;
-    const n = matrix[0].length;
-    const start: [number, number] = [m - 1, n - 1];
-    const end: [number, number] = [0, n - 1];
-    const visited = Array.from({ length: m }, () => Array(n).fill(false));
-    const directions: [number, number][] = [
-      [0, 1],
-      [1, 0],
-      [0, -1],
-      [-1, 0],
-    ];
+  private resetAllVisited() {
+    this.board.forEach(row => row.forEach(cell => cell.resetVisited()));
+  }
+
+  public shortestPathBFS(start: Node, end: Node, nodesToCover: Node[]): Node[] {
     let bestPathLen = Infinity;
-    let bestPathNodes: number[][] = [];
+    let bestPath: Node[] = [];
 
-    const isValid = (x: number, y: number) =>
-      0 <= x && x < m && 0 <= y && y < n;
-
-    const backtrack = (
-      x: number,
-      y: number,
-      covered: Set<[number, number]>,
-      pathLen: number,
-      currentPath: number[][]
-    ) => {
-      if (
-        x === end[0] &&
-        y === end[1] &&
-        covered.size === nodesToCover.length
-      ) {
-        if (pathLen < bestPathLen) {
-          bestPathLen = pathLen;
-          bestPathNodes = [...currentPath];
+    const backtrack = (remainingNodes: Node[], currentPath: Node[]) => {
+      if (remainingNodes.length === 0) {
+        this.resetAllVisited();
+        const newPath = this.bfs(currentPath[currentPath.length - 1], end);
+        if (newPath.length < bestPathLen) {
+          bestPath = [...currentPath, ...newPath];
+          bestPathLen = bestPath.length;
         }
         return;
       }
-      if (pathLen >= bestPathLen) return;
-      for (const [dx, dy] of directions) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (
-          isValid(nx, ny) &&
-          !visited[nx][ny] &&
-          !this.board[nx][ny].withinBorder
-        ) {
-          visited[nx][ny] = true;
-          currentPath.push([nx, ny]);
-          const key: [number, number] = [nx, ny];
-          if (nodesToCover.some((node) => node[0] === nx && node[1] === ny)) {
-            backtrack(
-              nx,
-              ny,
-              new Set(covered).add(key),
-              pathLen + 1,
-              currentPath
-            );
-          } else {
-            backtrack(nx, ny, covered, pathLen + 1, currentPath);
-          }
-          currentPath.pop();
-          visited[nx][ny] = false;
+
+      for (const node of remainingNodes) {
+        this.resetAllVisited();
+        for (const pathNode of currentPath) {
+          this.getNode(pathNode.x, pathNode.y).visited = true;
+        }
+
+        if (currentPath[currentPath.length - 1].equals(start) && node.equals(start)) {
+          continue;
+        }
+
+        const path = this.bfs(currentPath[currentPath.length - 1], node);
+        if (path.length > 0) {
+          backtrack(remainingNodes.filter(n => !n.equals(node)), [...currentPath, ...path.slice(1)]);
         }
       }
     };
 
-    visited[start[0]][start[1]] = true;
-    backtrack(start[0], start[1], new Set(), 0, [start]);
-
-    if (bestPathLen !== Infinity) {
-      return [bestPathLen, bestPathNodes];
-    } else {
-      return [null, []];
-    }
+    backtrack(nodesToCover, [start]);
+    return bestPath;
   }
 }
 
-// eventually add in functionality to add in an item for an aisl
 function createBoard(width: number, height: number) {
   let board = [];
-  //create the 2D Grid
   for (let i = 0; i < width; i++) {
     board[i] = [];
   }
@@ -293,8 +267,6 @@ function createBoard(width: number, height: number) {
 function linkNodes(board: Node[][]) {
   const height = board[0].length;
   const width = board.length;
-  console.log("width: ", width);
-  console.log("height: ", height);
   const edges: Edge[] = [];
 
   // this is for the columns
@@ -322,47 +294,29 @@ function linkNodes(board: Node[][]) {
   return edges;
 }
 
-function test() {
-  // width, height
-  const board = createBoard(4, 4);
-  const edges = linkNodes(board);
+const board1 = createBoard(10, 10);
+const edges1 = linkNodes(board1);
 
-  for (const edge of edges) {
-    edge.linkCells();
-  }
-
-  console.log("FIRST GO!");
-  const graph = new Graph(board, edges);
-  for (let i = 0; i < graph.board.length; i++) {
-    for (let j = 0; j < graph.board[0].length; j++) {
-      console.log(graph.board[i][j].print());
-    }
-  }
-
-  graph.createAisles(graph.board[0][0], graph.board[2][2]);
-
-  console.log("SECOND GO!");
-  for (let i = 0; i < graph.board.length; i++) {
-    for (let j = 0; j < graph.board[0].length; j++) {
-      console.log(graph.board[i][j].print());
-    }
-  }
-
-  const matrix = Array(4)
-    .fill(null)
-    .map(() => Array(4).fill(0)); // Properly initialize the matrix
-  const nodesToCover: [number, number][] = [
-    [0, 0],
-    [3, 0],
-    [0, 1],
-    [0, 2],
-    [2, 1],
-  ];
-  const [distance, path] = graph.shortestPath(matrix, nodesToCover);
-  console.log("Distance", distance);
-  console.log("Path", path);
+for (const edge1 of edges1) {
+  edge1.linkCells();
 }
+const graph1 = new Graph(board1, edges1);
 
-// test();
+graph1.createAisles(board1[2][6], board1[2][8]);
+graph1.createAisles(board1[5][1], board1[5][5]);
+graph1.createAisles(board1[8][6], board1[8][8]);
 
-export { Graph, Node, Edge, createBoard, linkNodes };
+const startNode = graph1.getNode(9, 9);
+const endNode = graph1.getNode(0, 9);
+const nodesToCover = [graph1.getNode(0, 7), graph1.getNode(2, 3), graph1.getNode(5, 7), graph1.getNode(7, 8), graph1.getNode(8, 2)];
+
+const path = graph1.shortestPathBFS(startNode, endNode, nodesToCover);
+console.log(`Shortest path length: ${path.length}`);
+const pathCoords = new Set();
+for (let node of path) {
+  pathCoords.add([node.x, node.y])
+}
+console.log('Path:', pathCoords);
+
+
+export { Graph, createBoard, linkNodes }
