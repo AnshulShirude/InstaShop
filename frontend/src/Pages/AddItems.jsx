@@ -25,7 +25,7 @@ function AddItems() {
     deodorant: "B16", // USING
     toilet: "D26",
     detergent: "D22",
-    broom: "D7", // USING
+    broom: "D7", // USING  
     toothpaste: "B6",
     eyeliner: "B5",
     football: "D21",
@@ -132,7 +132,7 @@ function AddItems() {
   };
   return (
     <>
-      <h1>Add Items!</h1>
+      <h1>Add Items</h1>
       <div
         style={{
           display: "flex",
@@ -141,15 +141,15 @@ function AddItems() {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <span>Input Your Items to add to your Shopping List!</span>
-          <input type="text" value={inputValue} onChange={handleInputChange} />
-          <button onClick={handleSubmit}>Submit</button>
+          <h3>Input Your Items</h3>
+          <input style={{backgroundColor: "white", fontSize:"20px", color: "black", width: "231px", height: "40px", border: "1px, black, solid"}} type="text" value={inputValue} onChange={handleInputChange} />
+          <button style={{backgroundColor: "black", fontSize:"20px", color: "white", width: "240px", height: "40px", border: "1px, black, solid"}} onClick={handleSubmit}>Submit</button>
         </div>
         <div>
-          <span>Created ShoppingList</span>
-          <ul>
+          <h3>Created ShoppingList</h3>
+          <ul style={{listStyle:"none", textAlign:"left"}}>
             {storedValues.map((value, index) => (
-              <li key={index}>
+              <li key={index} style={{fontSize:"18px" }}>
                 Item: {value.itemName} {value.loading ? "(loading...)" : ""},
                 Aisle: {value.aisleNumber}
               </li>
@@ -164,7 +164,7 @@ function AddItems() {
         }}
         style={{ marginTop: "10px" }}
       >
-        <button onClick={() => createUpdatedLinks()}>Go to the Map page</button>
+        <button style={{backgroundColor: "black", fontSize:"20px", color: "white", width: "240px", height: "60px", border: "1px, black, solid"}} className="bg-white text-black py-2 px-6 rounded hover:bg-gray-500 hover:text-white border border-white" onClick={() => createUpdatedLinks()}>Go to the Map page</button>
       </NavLink>
     </>
   );

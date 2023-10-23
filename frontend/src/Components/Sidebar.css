@@ -10,6 +10,7 @@
 .sidebar_container {
   display: flex;
   height: 100vh;
+  padding: 4px;
 }
 
 .main_container {
