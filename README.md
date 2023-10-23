@@ -1,4 +1,5 @@
 # InstaShop
+<img width="1596" alt="Screenshot 2023-10-22 at 7 44 54 AM" src="https://github.com/AnshulShirude/InstaShop/assets/34725764/3c49e7b7-f6fd-4718-9d39-cc630a42328e">
 
 **An efficient and new way to shop!**
 
